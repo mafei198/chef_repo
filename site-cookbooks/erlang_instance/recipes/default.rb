@@ -59,3 +59,54 @@ monit_check 'redis' do
     },
   ]
 end
+
+monit_check 'mysql' do
+  check_id '/var/run/mysqld/mysql.pid'
+  start    '/etc/init.d/mysql start'
+  stop     '/etc/init.d/mysql stop'
+  tests [
+    {
+      'condition' => 'failed port 3306',
+      'action'    => 'restart'
+    },
+    {
+      'condition' => '5 restarts within 5 cycles',
+      'action'    => 'timeout'
+    }
+  ]
+end
+
+# monit_check 'mysql' do
+#   id_type  'matching'
+#   check_id 'mysqld'
+#   start    '/etc/init.d/mysql start'
+#   stop     '/etc/init.d/mysql stop'
+#   tests [
+#     {
+#       'condition' => 'failed port 3306',
+#       'action'    => 'restart'
+#     },
+#     {
+#       'condition' => '5 restarts within 5 cycles',
+#       'action'    => 'timeout'
+#     }
+#   ]
+# end
+
+# FIXME reload not working
+service 'monit' do
+  action :restart
+end
+
+directory "/home/ubuntu/redis_db_data" do
+  action :create
+end
+
+package "ruby1.9.3"
+package "git-core"
+package "nodejs"
+
+gem_package "rails" do
+  version "3.2"
+  action  :install
+end

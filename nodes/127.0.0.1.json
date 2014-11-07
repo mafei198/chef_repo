@@ -1,15 +1,47 @@
 {"run_list": [
       "recipe[sudo]",
+      "recipe[ssh-keys]",
+      "recipe[sshd]",
       "recipe[nginx::package]",
+      "recipe[nginx_conf]",
       // "recipe[mysql::server]",
       // "recipe[mysql::client]",
       "recipe[erlang]",
       "recipe[redisio]",
       "recipe[redisio::enable]",
-      "recipe[erlang_instance]"
+      "recipe[erlang_instance]",
+      "recipe[zsh]",
+      "recipe[postfix]"
   ],
+  "authorization": {
+      "sudo": {
+          "groups": ["ubuntu"],
+          "users": ["ubuntu"],
+          "passwordless": "true"
+      }
+  },
+  "ssh_keys": {
+      "ubuntu": ["savin", "chizesheng"]
+  },
+  "sshd": {
+      "sshd_config": {"PasswordAuthentication": "no"}
+  },
   "nginx": {    
       "user": "ubuntu"
+  },
+  "nginx_conf": {
+      "listen": "9090",
+      "locations": {},
+      "options": {
+          "autoindex": "on",
+          "autoindex_exact_size": "off",
+          "autoindex_localtime": "on"
+      },
+      "confs": [{
+          "client_auto_update": {
+              "root": "/home/ubuntu/www/client_update/current/public/IOS"
+          }
+      }]
   },
   "mysql": {
       "server_root_password": ""
@@ -18,18 +50,16 @@
       "install_method": "source",
       "source": {"version": "R16B03-1"}
   },
-  "authorization": {
-      "sudo": {
-          "groups": ["ubuntu"],
-          "users": ["ubuntu"],
-          "passwordless": "true"
-      }
-  },
   "redisio": {
       "version": "2.8.17",
-      "default_settings": {"datadir": "~/redis_db_data"},
+      "default_settings": {"datadir": "/home/ubuntu/redis_db_data"},
       "servers": [
           {"port": 6379, "backuptype": "aof"}
       ]
+  },
+  "postfix": {
+      "main": {
+          "smtpd_use_tls": "no"
+      }
   }
 }
